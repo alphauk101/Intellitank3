@@ -1,0 +1,23 @@
+Intial brain dump for intellitank3
+
+Powered by 9 12v 1A LED Chips 6 white and 3 blue(night) - These are very bright (and very hot) over comes the issue of to many LED's not enough light.
+
+System will be powered by a 24v 5A+ reg psu.
+High power transistors have been ordered.
+
+The 8Seg display will be powered by the 7219max chip allowing the MCU to do other more important stuff than muxing a display.
+
+Features -
+room temp and hum 
+water temp
+PIR person detection
+
+The unit will not have a RTC this just caused more bother than it was worth - Just three modes:
+FULL - A person has been seen so lights on full
+DAWN (Half white and half blue) - This will occur after the timeout.
+NIGHT - This is mainly blue light, this is out standby mode.
+
+no bluetooth, I just simply never used this.
+
+I may have to monitor the temperature under the hood as the LED chips get VERY hot. though Im hoping to combat this by never having them
+at full power.
