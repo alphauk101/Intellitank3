@@ -12,6 +12,8 @@ blue = tank temp
 red = room temp and possibly humidity, if i can get it on the display (8 chars X 8 segs).
 I would like to see if I can monitor anything else in the tank water PH etc would be awesome (but expensive).
 
+I am going to keep the blue leds on all the time as it nutralises the natural yellowing in the water
+
 I am going to buy a PSU that I can put inside the plasic enclosure so that everything is in a neat package.
 
 
@@ -34,4 +36,7 @@ Molex for connecting the lights to the control unit  probably a an external plug
 as the lights will be attached.
 
 
-
+components:
+More blue leds 
+temp/humid sensor
+ds18b probe
