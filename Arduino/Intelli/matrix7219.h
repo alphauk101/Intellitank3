@@ -20,10 +20,14 @@ public:
   void testDisplay(void);//Simply puts display into test mode (all leds)
   void setDecodeMode(byte);//Sets the mode according to the DS table 4 decode mode.
   void updateDisplay(byte*);//The big one that applies the bytes to the screen
+  void clearBuffer();//clears the buffer used for the 7 segments display.
+  void displayNumber(int);//Displays the given number on the display.
+  void demo(void);//Shows a cool demo for intellitank
 private: 
   inline void setClock(int);
   inline void setLatch(int);
   void shift(byte, byte);//Shifts these 16 bits in
+  void shootingStars(void);
 };
 #endif
 
