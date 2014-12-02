@@ -16,6 +16,11 @@ void Lighting::init(int whtPIN, int bluePIN)
   //Now we need to set the lights to the default on level
 }
 
+int Lighting::getCurrentMode()
+{
+  return CURRENT_MODE;
+}
+
 /*This changes the current light level to the new one in a fading manner*/
 void Lighting::setSingleLightLevel(int whatLight, int Level)
 {
@@ -61,18 +66,22 @@ void Lighting::applyMode(int mode)
     switch (mode)
     {
       case MODE_FULL_DAY:
+
         //Simple both white and blue lights full on!
         setBothLightLevels(MAX_LIGHT);//Done!
         break;
       case MODE_HALF_DAY:
+
         setBothLightLevels(HALF_LIGHT);//This should be our dawn mode.
         break;
       case MODE_NIGHT:
+
         //Here we are into night mode so our blue light should be main
         setSingleLightLevel(BLUE_LIGHT_PIN, MAX_LIGHT);//Set the blue to full
         setSingleLightLevel(WHITE_LIGHT_PIN, MIN_LIGHT);//Set the white to just a very slight tinge.
         break;
       case MODE_STANDBY:
+
         setBothLightLevels(MIN_LIGHT);//Set both lights to barely on.
         break;
       default:
@@ -85,24 +94,24 @@ void Lighting::applyMode(int mode)
 /*Allows us to keep track of the values were setting in our lights*/
 inline void Lighting::setValueToLight(int whatLight, int level)
 {
-  if(whatLight == WHITE_LIGHT_PIN)
+  if (whatLight == WHITE_LIGHT_PIN)
   {
     WHITE_CURRENT_LVL = level;
-    analogWrite(WHITE_LIGHT_PIN,level);
-  }else if(whatLight == BLUE_LIGHT_PIN)
+    analogWrite(WHITE_LIGHT_PIN, level);
+  } else if (whatLight == BLUE_LIGHT_PIN)
   {
     BLUE_CURRENT_LVL = level;
-    analogWrite(BLUE_LIGHT_PIN,level);
+    analogWrite(BLUE_LIGHT_PIN, level);
   }
 }
 
 inline int Lighting::getLightLevel(int light)
 {
-  if(light == WHITE_LIGHT_PIN)
+  if (light == WHITE_LIGHT_PIN)
   {
     return WHITE_CURRENT_LVL;
-  }else{
+  } else {
     return BLUE_CURRENT_LVL;
   }
-  
+
 }
