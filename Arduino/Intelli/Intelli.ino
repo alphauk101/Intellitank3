@@ -20,6 +20,8 @@ Matrix matrix;//Display driver
 Lighting lighting;//LED lighting driver.
 Timer timer;//Our timer class
 
+boolean INT_TRIGGERED = false;//This allows us to disable the interrupt until weve finished the routine
+
 
 void setup() {
   if (ENABLEDB) {
@@ -49,6 +51,9 @@ void loop() {
   //displaying of temp etc.
 
 
+  //We need make sure were displaying the right temps etc
+
+
   timer.nudge();//This is important to ensure out timer keeps turning
   delay(10);//Slow the 32Mhz of raging power a tad.
 }
@@ -64,19 +69,21 @@ void setmode(int mode)
       lighting.applyMode(MODE_FULL_DAY);
       //we need to start the timer
       timer.init(1, DAYMODE_LENGTH); //We are setting our timer for day mode.
-      timer.startTimer(1);
+      timer.startTimer(TIMER_1);
+      INT_TRIGGERED = false;//Reset this so that the interrupt is reenabled.
+
       break;
     case (MODE_HALF_DAY)://Dawn mode
       if (ENABLEDB) Serial.println("set mode dawn");
       lighting.applyMode(MODE_HALF_DAY);
       timer.init(1, DAWNMODE_LENGTH); //We are setting our timer for day mode.
-      timer.startTimer(1);
+      timer.startTimer(TIMER_1);
       break;
     case (MODE_NIGHT):
       if (ENABLEDB) Serial.println("set mode night");
       lighting.applyMode(MODE_NIGHT);
       timer.init(1, NIGHTMODE_LENGTH); //We are setting our timer for day mode.
-      timer.startTimer(1);
+      timer.startTimer(TIMER_1);
       break;
     case (MODE_STANDBY):
       if (ENABLEDB) Serial.println("set mode standy by");
@@ -118,8 +125,11 @@ int getNextMode(int current)
 void  pirTriggered()
 {
   if (ENABLEDB) Serial.println("PIR TRIGGERED");
-  timer.resetAllTimers();//Stops all the timers
-  setmode(DAYMODE_LENGTH);//We are restaring our routine
+  if (! INT_TRIGGERED) {//Only service this routine if its not currently being service.
+    INT_TRIGGERED = true;
+    timer.resetAllTimers();//Stops all the timers
+    setmode(MODE_FULL_DAY);//We are restaring our routine
+  }
 }
 
 //Timer callback returns which timer was fired
