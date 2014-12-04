@@ -9,10 +9,13 @@ Project wide definitions
 #define TIMER_2 2
 #define TIMER_3 3
 
-#define DAYMODE_LENGTH 20000UL //1 minute at the moment
-#define DAWNMODE_LENGTH 10000UL
-#define NIGHTMODE_LENGTH 10000UL
-#define STANDBY_LENGTH 10000UL
+#define DAYMODE_LENGTH (unsigned long) (60000 * 1)//5 = minutes
+#define DAWNMODE_LENGTH (unsigned long) (60000 * 1)
+#define NIGHTMODE_LENGTH (unsigned long) (60000 * 1)
+
+//Display toggling defines
+#define DISPLAY_TOGGLE_PERIOD (unsigned long) 10000 //Every 30secs the display changes
+
 
 #define MODE_FULL_DAY 1 //Full lighting usually after a PIR trigger
 #define MODE_HALF_DAY 2 //A Slightly less intense day

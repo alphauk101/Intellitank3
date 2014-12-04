@@ -10,18 +10,28 @@ boolean ENABLEDB = true;//Our global for enabling debug out.
 #include "lighting.h"
 #include "timer.h"
 
+//LED pins to show which mode were displaying
+#define LEDGREENPIN 5
+#define LEDBLUEPIN 6
+#define LEDREDPIN 7
+
 #define CSPIN 2
 #define DINPIN 7
 #define CLKPIN 8
+#define DHT11PIN 10 //This is what our temp sensor 
 #define WHITELEDPIN 10
 #define BLUELEDPIN 11
+
+typedef int displayMode;
+#define externalTemp 0
+#define internalTemp 1
 
 Matrix matrix;//Display driver
 Lighting lighting;//LED lighting driver.
 Timer timer;//Our timer class
 
 boolean INT_TRIGGERED = false;//This allows us to disable the interrupt until weve finished the routine
-
+displayMode mDisplayMode = externalTemp;//Set our default mode
 
 void setup() {
   if (ENABLEDB) {
@@ -43,15 +53,28 @@ void setup() {
   //We must put the tank into just triggered mode.
   setmode(MODE_FULL_DAY);
   //and let the looptake care of the rest
+
+  timer.init(TIMER_2, DISPLAY_TOGGLE_PERIOD);//This tells us to chenge what were displaying
+  timer.startTimer(TIMER_2);
 }
 
 void loop() {
 
   //This is where we shall do all our
   //displaying of temp etc.
+  switch (mDisplayMode)
+  {
+    case (externalTemp):
+      //display the outdoor temp
 
 
-  //We need make sure were displaying the right temps etc
+      break;
+    case (internalTemp):
+
+      break;
+  }
+
+
 
 
   timer.nudge();//This is important to ensure out timer keeps turning
@@ -68,7 +91,7 @@ void setmode(int mode)
       if (ENABLEDB) Serial.println("set mode full");
       lighting.applyMode(MODE_FULL_DAY);
       //we need to start the timer
-      timer.init(1, DAYMODE_LENGTH); //We are setting our timer for day mode.
+      timer.init(TIMER_1, DAYMODE_LENGTH); //We are setting our timer for day mode.
       timer.startTimer(TIMER_1);
       INT_TRIGGERED = false;//Reset this so that the interrupt is reenabled.
 
@@ -88,11 +111,12 @@ void setmode(int mode)
     case (MODE_STANDBY):
       if (ENABLEDB) Serial.println("set mode standy by");
       lighting.applyMode(MODE_STANDBY);
-      timer.resetAllTimers();
+      timer.stopTimer(TIMER_1);
       //We dont use a timer now because we stay in this mode until its repeated by pir
       break;
     default:
       //do nothing
+      if (ENABLEDB) Serial.println("set mode default case hit!!!!!");
       break;
   }
 }
@@ -117,6 +141,7 @@ int getNextMode(int current)
       break;
     default:
       return MODE_STANDBY;//We cant go any lower than this
+      if (ENABLEDB) Serial.println("getNextMode default case hit!!!!!");
       break;
   }
 }
@@ -127,7 +152,7 @@ void  pirTriggered()
   if (ENABLEDB) Serial.println("PIR TRIGGERED");
   if (! INT_TRIGGERED) {//Only service this routine if its not currently being service.
     INT_TRIGGERED = true;
-    timer.resetAllTimers();//Stops all the timers
+
     setmode(MODE_FULL_DAY);//We are restaring our routine
   }
 }
@@ -146,11 +171,27 @@ static void TimerISR(int timer)
       setmode(mode);
       //Now we can see the next mode.
       break;
+    case (TIMER_2):
+      if (ENABLEDB) Serial.println("TIMER 2 TRIGGERED");
+      changeDisplayMode();//Toggles the display mode
+      break;
     default:
       //Do nothing
       break;
   }
 }
 
+void changeDisplayMode()
+{
+  if (mDisplayMode == externalTemp)
+  {
+    if (ENABLEDB) Serial.println("Display internal temp");
+    mDisplayMode = internalTemp;
+  } else {
+    if (ENABLEDB) Serial.println("Display external temp");
+    mDisplayMode = externalTemp;
+  }
+  timer.startTimer(TIMER_2);//restart the timer
+}
 
 
