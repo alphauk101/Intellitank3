@@ -1,0 +1,29 @@
+ztx450 hfe = 100
+2n3055 = 20
+
+moon = 4000 Ma
+standard * 2 = 3000Ma
+
+
+moon
+====
+
+load / hfe = base current
+4000 / 20 = 200Ma (2n3 trans)
+ztx450
+200 / 100 = 2Ma (ztx450)
+
+5v - 0.5 = 4.5v
+4.5 / 0.002 = 2250K
+
+standard
+=======
+
+3000 / 20 =  150 Ma (base)
+ztx
+150/100 =1.5 Ma
+
+4.5v / 0.0015 = 3000K
+
+
+
