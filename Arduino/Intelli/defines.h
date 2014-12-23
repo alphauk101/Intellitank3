@@ -9,12 +9,17 @@ Project wide definitions
 #define TIMER_2 2
 #define TIMER_3 3
 
-#define DAYMODE_LENGTH (unsigned long) (60000 * 1)//5 = minutes
-#define DAWNMODE_LENGTH (unsigned long) (60000 * 1)
-#define NIGHTMODE_LENGTH (unsigned long) (60000 * 1)
+#define DHTLIB_OK		 0
+#define DHTLIB_ERROR_CHECKSUM	-1
+#define DHTLIB_ERROR_TIMEOUT	-2
+#define DHTLIB_INVALID_VALUE	-999
+
+#define DAYMODE_LENGTH (unsigned long) 1800000//10 = minutes
+#define DAWNMODE_LENGTH (unsigned long) 300000
+#define NIGHTMODE_LENGTH (unsigned long) 1800000
 
 //Display toggling defines
-#define DISPLAY_TOGGLE_PERIOD (unsigned long) 10000 //Every 30secs the display changes
+#define DISPLAY_TOGGLE_PERIOD (unsigned long) 60000 //Every 30secs the display changes
 
 
 #define MODE_FULL_DAY 1 //Full lighting usually after a PIR trigger

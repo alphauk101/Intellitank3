@@ -2,23 +2,20 @@
 Intelli Tank 3
 
 ****************************/
-boolean ENABLEDB = true;//Our global for enabling debug out.
+boolean ENABLEDB = false;//Our global for enabling debug out.
 
 //Important definitions
 #include "defines.h"
 #include "matrix7219.h"
 #include "lighting.h"
 #include "timer.h"
+#include "ds.h"
+#include "DHT11.h"
 
-//LED pins to show which mode were displaying
-#define LEDGREENPIN 5
-#define LEDBLUEPIN 6
-#define LEDREDPIN 7
-
-#define CSPIN 2
+#define CSPIN A2
 #define DINPIN 7
 #define CLKPIN 8
-#define DHT11PIN 10 //This is what our temp sensor 
+#define DHT11PIN 12 //This is what our temp sensor 
 #define WHITELEDPIN 10
 #define BLUELEDPIN 11
 
@@ -29,6 +26,9 @@ typedef int displayMode;
 Matrix matrix;//Display driver
 Lighting lighting;//LED lighting driver.
 Timer timer;//Our timer class
+ds waterSensor;//Water probe temperature
+dht roomSensor;//room sensor.
+
 
 boolean INT_TRIGGERED = false;//This allows us to disable the interrupt until weve finished the routine
 displayMode mDisplayMode = externalTemp;//Set our default mode
@@ -57,25 +57,34 @@ void setup() {
   timer.init(TIMER_2, DISPLAY_TOGGLE_PERIOD);//This tells us to chenge what were displaying
   timer.startTimer(TIMER_2);
 }
-
+float temp;
 void loop() {
 
+
+  
   //This is where we shall do all our
   //displaying of temp etc.
   switch (mDisplayMode)
   {
     case (externalTemp):
       //display the outdoor temp
-
-
+      if(roomSensor.read11(DHT11PIN) == DHTLIB_OK)
+      {
+        //We have a reading.  
+        float tmp = (float) roomSensor.temperature;
+        float hum = (float) roomSensor.humidity;
+        matrix.showRoomTempAndHum(tmp,hum);
+      }
+           
       break;
     case (internalTemp):
-
+      temp = waterSensor.getTemp();
+      matrix.dispWaterTemp(temp);
+      //e need to disp this temp.
+      
+      
       break;
   }
-
-
-
 
   timer.nudge();//This is important to ensure out timer keeps turning
   delay(10);//Slow the 32Mhz of raging power a tad.
@@ -88,6 +97,7 @@ void setmode(int mode)
   switch (mode)
   {
     case (MODE_FULL_DAY):
+      //matrix.showMode();
       if (ENABLEDB) Serial.println("set mode full");
       lighting.applyMode(MODE_FULL_DAY);
       //we need to start the timer
@@ -97,18 +107,21 @@ void setmode(int mode)
 
       break;
     case (MODE_HALF_DAY)://Dawn mode
+      //matrix.showMode();
       if (ENABLEDB) Serial.println("set mode dawn");
       lighting.applyMode(MODE_HALF_DAY);
       timer.init(1, DAWNMODE_LENGTH); //We are setting our timer for day mode.
       timer.startTimer(TIMER_1);
       break;
     case (MODE_NIGHT):
+      //matrix.showMode();
       if (ENABLEDB) Serial.println("set mode night");
       lighting.applyMode(MODE_NIGHT);
       timer.init(1, NIGHTMODE_LENGTH); //We are setting our timer for day mode.
       timer.startTimer(TIMER_1);
       break;
     case (MODE_STANDBY):
+      //matrix.showMode();
       if (ENABLEDB) Serial.println("set mode standy by");
       lighting.applyMode(MODE_STANDBY);
       timer.stopTimer(TIMER_1);
@@ -152,7 +165,6 @@ void  pirTriggered()
   if (ENABLEDB) Serial.println("PIR TRIGGERED");
   if (! INT_TRIGGERED) {//Only service this routine if its not currently being service.
     INT_TRIGGERED = true;
-
     setmode(MODE_FULL_DAY);//We are restaring our routine
   }
 }

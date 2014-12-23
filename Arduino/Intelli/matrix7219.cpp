@@ -30,6 +30,11 @@ byte n = 0x15;
 byte t = 0x0f;
 byte e = 0x4f;
 byte l = 0x0e;
+byte c = 0x0D;
+byte dash = 0x01;
+byte period = 0x80;
+byte H = 0x37;
+
 
 void Matrix::demo()
 {
@@ -47,6 +52,81 @@ void Matrix::demo()
   displayBuf[0] = numberMatrix[3];
   updateDisplay(displayBuf);
   delay(1000);
+}
+
+byte fltTempArray[3];
+void Matrix::dispWaterTemp(float temp)
+{
+  //Reset the array
+  fltTempArray[0] = 0x00;
+  fltTempArray[1] = 0x00;
+  fltTempArray[2] = 0x00;
+
+  //Convert our temperature to a array
+  int expo = convertFloatToArray(temp, fltTempArray);
+
+  //We should now have an array to display
+  clearBuffer();
+  displayBuf[7] = dash;
+  displayBuf[6] = dash;
+  displayBuf[5] = numberMatrix[fltTempArray[0]];
+  //We need add the full stop
+
+  byte dispStopNum = numberMatrix[fltTempArray[1]];
+  dispStopNum |= period;
+
+  displayBuf[4] = dispStopNum;
+  displayBuf[3] = numberMatrix[fltTempArray[2]];
+  displayBuf[2] = c;
+  displayBuf[1] = dash;
+  displayBuf[0] = dash;
+  updateDisplay(displayBuf);
+}
+
+int Matrix::convertFloatToArray(float temp, byte* fltArray)
+{
+  byte a;
+  byte b;
+  byte c;
+  int number = temp * 10; //removes the decimal point
+  if (number > 99)
+  {
+    //we know there are three elements
+    a = number / 100;
+    b = (number / 10) % 10;
+    c = number % 10;
+
+    *fltArray = a;
+    *(fltArray + 1) = b;
+    *(fltArray + 2) = c;
+
+    return 3;
+  } else {
+    a = (number / 10) % 10;
+    b = number % 10;
+    *fltArray = a;
+    *(fltArray + 1) = b;
+    *(fltArray + 2) = c;
+    return 2;
+  }
+}
+
+void Matrix::showMode()
+{
+  //I need to build on this but its just demo
+  clearBuffer();
+  updateDisplay(displayBuf);
+
+  for (int a = 0 ; a < 8; a++)
+  {
+    clearBuffer();
+    displayBuf[a] = dash;
+    updateDisplay(displayBuf);
+    delay(50);
+  }
+
+  clearBuffer();
+  updateDisplay(displayBuf);
 }
 
 void Matrix::shootingStars()
@@ -76,6 +156,38 @@ void Matrix::displayNumber(int number)
   displayBuf[0] = numberMatrix[number];
   updateDisplay(displayBuf);
   //demo();
+}
+
+void Matrix::showRoomTempAndHum(float temp, float hum)
+{
+  fltTempArray[0] = 0x00;
+  fltTempArray[1] = 0x00;
+  fltTempArray[2] = 0x00;
+  clearBuffer();//makesure our buffers cleared
+  if (convertFloatToArray(temp, fltTempArray) == 3)
+  {
+    displayBuf[7] = numberMatrix[fltTempArray[0]];
+    byte dispStopNum = numberMatrix[fltTempArray[1]];
+    dispStopNum |= period;
+    displayBuf[6] = dispStopNum;
+    displayBuf[5] = numberMatrix[fltTempArray[2]];
+  } else {
+    displayBuf[7] = 0x00;//Blank
+    byte dispStopNum = numberMatrix[fltTempArray[0]];
+    dispStopNum |= period;
+    displayBuf[6] = dispStopNum;
+    displayBuf[5] = numberMatrix[fltTempArray[1]];
+  }
+  displayBuf[4] = c;
+  //Now hum
+  fltTempArray[0] = 0x00;
+  fltTempArray[1] = 0x00;
+  fltTempArray[2] = 0x00;
+  convertFloatToArray(hum, fltTempArray);
+  displayBuf[2] = numberMatrix[fltTempArray[0]];
+  displayBuf[1] = numberMatrix[fltTempArray[1]];
+  displayBuf[0] = H;
+  updateDisplay(displayBuf);
 }
 
 /**********************************************************
